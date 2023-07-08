@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <title>Star Wars CC</title>z
+</head>
+<body>
+    <h1>Star Wars<br>StarShip<br>Comparsion</h1>
+    <div>"
+        <embed src="StarWarsTheme.mp3" loop="true" autostart="true" width="2" height="0" type="">
+        <div class="container">
+            <div class="row mb-3">
+                <div class="col-sm-6">  
+                    <label for="character1" class="form-label">Starship 1</label>
+                    <input type="text" class="form-control" id="character1" placeholder="Enter a Starship">
+                </div>
+                <div class="col-sm-6">
+                    <label for="character2" class="form-label">Starship 2</label>
+                    <input type="text" class="form-control" id="character2" placeholder="Enter a Starship">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col text-center">
+                    <button class="btn btn-primary" onclick="compareCharacters()">
+                        Compare  
+                    </button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="column">
+                    <div class="d-flex justify-content-center">
+                        <div class="comparsion-result character1 ml-3">
+                             
+                        </div>
+                        <div class="comparsion-result character2 mr-3">
+                             
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.js"></script>
+    <script>
+
+        async function fetchCharacter(name){
+            const response = await fetch(`https://swapi.dev/api/starships/?search=${name}`);
+            console.log(response);
+            if(response.ok){
+                const data = await response.json();
+                console.log(data.results[0]);
+                if(data.count>0){
+                    return data.results[0];
+                } else{
+                    throw new Error(`Character not found: ${name}`) 
+                }
+            } else {
+                throw new Error(`Error fetching character: ${response.statusText}`)
+            }
+        }
+        async function compareCharacters() {
+            const starship1Id = document.getElementById("character1").value;
+            const starship2Id = document.getElementById("character2").value;
+            try {
+                const starship1 = await fetchCharacter(starship1Id);
+                const starship2 = await fetchCharacter(starship2Id);
+                const star1length = parseInt(starship1.length);
+                const star2length = parseInt(starship2.length);
+                var star1MAS = parseInt(starship1.max_atmosphering_speed);
+                var star2MAS = parseInt(starship2.max_atmosphering_speed);
+                const star1hyper = parseFloat(starship1.hyperdrive_rating);
+                const star2hyper = parseFloat(starship2.hyperdrive_rating);
+                const star1MGLT = parseInt(starship1.MGLT);
+                const star2MGLT = parseInt(starship2.MGLT);
+                var lMessage = ""
+                var MMessage = ""
+                var hMessage = ""
+                var MGLTMessage = ""
+                console.log(star1MGLT,star2MGLT)
+                star1MAS = isNaN(star1MAS)?0:star1MAS;
+                star2MAS = isNaN(star2MAS)?0:star2MAS;
+
+                if(isNaN(star1MGLT) || isNaN(star2MGLT) || isNaN(star1length) || isNaN(star2length) || isNaN(star1hyper) || isNaN(star2hyper)){
+                    throw new Error('Unable to parse starship/s values');
+                }
+                if(star1length>star2length){
+                    lMessage = `Starship with higher length: ${starship1.name}`;
+                } else if(star1length<star2length){
+                    lMessage = `Starship with higher length: ${starship2.name}`;
+                } else{
+                    lMessage = `Both starship have same length: ${starship1.length}`;
+                }
+
+                if(star1MAS>star2MAS){
+                    MMessage = `Starship with higher max_atmospheric_speed: ${starship1.name}`;
+                } else if(star1length<star2length){
+                    MMessage = `Starship with higher max_atmospheric_speed: ${starship2.name}`;
+                } else{
+                    MMessage = `Both starship have same Max Atmosheric Speed: ${starship1.max_atmosphering_speed}`;
+                }
+
+                if(star1hyper>star2hyper){
+                    hMessage = `Starship with higher Hyperdrive Rating: ${starship1.name}`;
+                } else if(star1length<star2length){
+                    hMessage = `Starship with higher Hyperdrive Rating: ${starship2.name}`;
+                } else{
+                    hMessage = `Both starship have same Hyperdrive Rating: ${starship1.hyperdrive_rating}`;
+                }
+
+                if(star1MGLT>star2MGLT){
+                    MGLTMessage = `Starship with higher MGLT: ${starship1.name}`;
+                } else if(star1MGLT<star2MGLT){
+                    MGLTMessage = `Starship with higher MGLT: ${starship2.name}`;
+                } else{
+                    MGLTMessage = `Both starship have same MGLT: ${starship1.hyperdrive_rating}`;
+                }
+                console.log(lMessage);
+                console.log(hMessage);
+                console.log(MMessage);
+                console.log(MGLTMessage);
+                const comparsionResult = `
+                <div class="row">
+                <div class="col-md-6">
+                     <h3>${starship1.name}</h3>
+                     <p>Length: ${star1length} </p>
+                     <p>Max Atmospheric Speed: ${star1MAS} </p>
+                     <p>Hyperdrive Rating: ${star1hyper} </p>
+                     <p>MGLT: ${star1MGLT}</p>
+                </div>
+                <div class="col-md-6">
+                    <h3>${starship2.name}</h3>
+                     <p>Length: ${star2length} </p>
+                     <p>Max Atmospheric Speed: ${star2MAS} </p>
+                     <p>Hyperdrive Rating: ${star2hyper} </p>
+                     <p>MGLT: ${star2MGLT}</p>
+                </div>
+                <div class="col-mt-3" style="text-align:center; border: solid #f1c40f">
+                     <p><u>${lMessage}</u></p>
+                     <p><u>${MMessage}</u></p>
+                     <p><u>${hMessage}</></p>
+                     <p><u>${MGLTMessage}</u></p>
+                </div>
+                </div>
+                `;
+                document.querySelector(".comparsion-result").innerHTML = comparsionResult;
+            }
+            catch(error){
+                alert(error);
+            }
+        }
+    </script>
+</body>
+</html>
